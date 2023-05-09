@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChirpController;
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\EnsureTokenIsValid;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,5 +41,14 @@ Route::middleware('auth')->group(function () {
 Route::resource('chirps', ChirpController::class)
     ->only(['index', 'store', 'update', 'destroy'])
     ->middleware(['auth', 'verified']);
+
+Route::get('/search/{search}', function (string $search) {
+    return $search;
+})->where('search', '.*');
+
+Route::get('/user/profile', function () {
+    $url = route('profile');
+    return $url;
+})->name('profile')->middleware(EnsureTokenIsValid::class);
 
 require __DIR__ . '/auth.php';
