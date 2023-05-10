@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Models\User;
+use App\Notifications\NewChirp;
 
 class ChirpCreated implements ShouldQueue
 {
@@ -24,8 +26,10 @@ class ChirpCreated implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(ChirpCreated $event): void
     {
-        //
+        foreach (User::whereNot('id', $event->chirp->user_id)->cursor() as $user) {
+            $user->notify(new NewChirp($event->chirp));
+        }
     }
 }
